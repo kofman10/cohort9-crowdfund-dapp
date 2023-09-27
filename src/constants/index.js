@@ -1,5 +1,5 @@
 export const supportedChains = [11155111, 84531];
-
+export const contractAddress = "0x46f44F2D1af04D54ab5BCbEF9F4D0Df9baDc1B8C"
 export const networkInfoMap = {
     11155111: {
         chainId: `0x${(11155111).toString(16)}`,
