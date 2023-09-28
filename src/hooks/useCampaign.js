@@ -18,9 +18,8 @@ const useCampaign = () => {
           provider
         );
         const id = await campaignContract.id();
-
         for (let i = 1; i <= id; i++) {
-          const campaign = await campaignContract.crowd(i);
+          const campaign =  campaignContract.crowd(i);
           campaigns.push(campaign);
         }
 
@@ -42,7 +41,6 @@ const useCampaign = () => {
 
     fetchData();
   }, [provider]);
-
   return campaignList;
 };
 

@@ -4,13 +4,11 @@ import  useCampaign  from '../hooks/useCampaign';
 const Campaigns = () => {
 
     const  campaignList  = useCampaign();
-    console.log(campaignList)
   return (
-    <div>
-        Campaigns
+    <div className='flex justify-center'>
         <ul>
                 {campaignList.map((campaign, index) => (
-                    <li key={index}>
+                    <li className='mt-10' key={index}>
                         <strong>Title:</strong> {campaign.title}<br />
                         <strong>Funding Goal:</strong> {campaign.fundingGoal}<br />
                         <strong>Owner:</strong> {campaign.owner}<br />
