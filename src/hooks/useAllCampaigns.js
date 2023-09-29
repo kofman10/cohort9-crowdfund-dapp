@@ -62,22 +62,18 @@ const useAllCampaigns = () => {
         // Listen for event
         const handleProposeCampaignEvent = async (id, title, amount, duration) => {
             const newCampaignDetails = await contract.crowd(id);
-            setNewCampaign({
-                title: title,
-                amount: amount,
-                duration: duration
-            })
+         
             console.log(newCampaignDetails)
-            // setNewCampaign({
-            //     id: id,
-            //     title: title,
-            //     fundingGoal: newCampaignDetails.fundingGoal,
-            //     owner: newCampaignDetails.owner,
-            //     durationTime: Number(newCampaignDetails.durationTime),
-            //     isActive: newCampaignDetails.isActive,
-            //     fundingBalance: newCampaignDetails.fundingBalance,
-            //     contributors: [], // You can initialize contributors as an empty array
-            // });
+            setNewCampaign({
+                id: id,
+                title: title,
+                fundingGoal: newCampaignDetails.fundingGoal,
+                owner: newCampaignDetails.owner,
+                durationTime: Number(newCampaignDetails.durationTime),
+                isActive: newCampaignDetails.isActive,
+                fundingBalance: newCampaignDetails.fundingBalance,
+                contributors: [],
+            });
         };
         const contract = getCrowdfundContractWithProvider(provider);
         contract.on("ProposeCampaign", handleProposeCampaignEvent);
