@@ -8,9 +8,10 @@ import {
 
 const useAllCampaigns = () => {
     const [campaigns, setCampaigns] = useState([]);
+    const [newCampaign, setNewCampaign] = useState(null);
     const { provider } = useConnection();
     const campaignNo = useCampaignCount();
-
+    
     useEffect(() => {
         const fetchAllCampaigns = async () => {
             try {
@@ -22,11 +23,15 @@ const useAllCampaigns = () => {
                 const campaignPromises = campaignsKeys.map((id) =>
                     contract.crowd(id)
                 );
-
+                const campaignAddresses = campaignsKeys.map(id => contract.getContributors(id))
+                
                 const campaignResults = await Promise.all(campaignPromises);
+                const campaignContributors = await Promise.all(campaignAddresses);
 
                 const campaignDetails = campaignResults.map(
-                    (details, index) => ({
+                    (details, index) => { 
+                        const contributorAddresses = campaignContributors[index];
+                        return {
                         id: campaignsKeys[index],
                         title: details.title,
                         fundingGoal: details.fundingGoal,
@@ -34,9 +39,15 @@ const useAllCampaigns = () => {
                         durationTime: Number(details.durationTime),
                         isActive: details.isActive,
                         fundingBalance: details.fundingBalance,
-                        contributors: details.contributors,
-                    })
+                        contributors: contributorAddresses,
+                    }
+                }
                 );
+                console.log(newCampaign)
+                if (newCampaign) {
+                    campaignDetails.push(newCampaign);
+                    setNewCampaign(null); 
+                }
 
                 setCampaigns(campaignDetails);
             } catch (error) {
@@ -44,11 +55,29 @@ const useAllCampaigns = () => {
             }
         };
 
+
         fetchAllCampaigns();
+        console.log(newCampaign)
 
         // Listen for event
-        const handleProposeCampaignEvent = (id, title, amount, duration) => {
-            console.log({ id, title, amount, duration });
+        const handleProposeCampaignEvent = async (id, title, amount, duration) => {
+            const newCampaignDetails = await contract.crowd(id);
+            setNewCampaign({
+                title: title,
+                amount: amount,
+                duration: duration
+            })
+            console.log(newCampaignDetails)
+            // setNewCampaign({
+            //     id: id,
+            //     title: title,
+            //     fundingGoal: newCampaignDetails.fundingGoal,
+            //     owner: newCampaignDetails.owner,
+            //     durationTime: Number(newCampaignDetails.durationTime),
+            //     isActive: newCampaignDetails.isActive,
+            //     fundingBalance: newCampaignDetails.fundingBalance,
+            //     contributors: [], // You can initialize contributors as an empty array
+            // });
         };
         const contract = getCrowdfundContractWithProvider(provider);
         contract.on("ProposeCampaign", handleProposeCampaignEvent);
@@ -56,7 +85,7 @@ const useAllCampaigns = () => {
         return () => {
             contract.off("ProposeCampaign", handleProposeCampaignEvent);
         };
-    }, [campaignNo, provider]);
+    }, [campaignNo, provider, newCampaign]);
 
     return campaigns;
 };
